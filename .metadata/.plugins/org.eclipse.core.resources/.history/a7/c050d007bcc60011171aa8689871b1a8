@@ -1,0 +1,9 @@
+package com.study.backend.projections;
+
+public interface CategoryProjection {
+	
+	// getter
+	Integer getId();
+	String getName();
+
+}
