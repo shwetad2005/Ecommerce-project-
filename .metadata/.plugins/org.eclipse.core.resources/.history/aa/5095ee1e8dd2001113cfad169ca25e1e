@@ -1,0 +1,79 @@
+package com.study.backend.services.impl;
+
+import java.util.ArrayList;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
+import com.study.backend.dtos.AddToCartRequestDto;
+import com.study.backend.entities.Cart;
+import com.study.backend.entities.CartItem;
+import com.study.backend.entities.Product;
+import com.study.backend.entities.User;
+import com.study.backend.exceptions.IdNotFoundException;
+import com.study.backend.repositories.CartItemRepository;
+import com.study.backend.repositories.CartRepository;
+import com.study.backend.repositories.ProductRepository;
+import com.study.backend.repositories.UserRepository;
+import com.study.backend.services.CartService;
+
+public class CartServiceImpl implements CartService{
+
+	@Autowired
+	private UserRepository userRepository;
+	
+	@Autowired
+	private CartRepository cartRepository;
+	
+	@Autowired
+	private ProductRepository productRepository;
+	
+	@Autowired
+	private CartItemRepository cartItemRepository;
+	
+	
+	@Override
+	public void addTocart(AddToCartRequestDto addToCartRequestDto) {
+		// TODO Auto-generated method stub
+		
+		Cart cart = getCart(addToCartRequestDto.getUserId());
+		Integer productId = addToCartRequestDto.getProductId();
+		
+		Product product = productRepository.findById(productId)
+		              .orElseThrow(()->new IdNotFoundException
+			                	("Product with given id not found"));
+		
+		for(CartItem item:cart.getCartItems())               // cartItem variable one by one come in that item variable 
+		{
+			if(item.getProduct().getId()==(productId))
+			{
+				item.setQuantity(item.getQuantity()+addToCartRequestDto.getQuantity());
+				cartItemRepository.save(item);     // changes details save in item variable
+				
+			}
+		}
+	}
+
+	@Override
+	public Cart getCart(String userId) {
+		// TODO Auto-generated method stub
+		User user= userRepository.findById(userId)  
+				.orElseThrow(()->new IdNotFoundException    // orElseThrow: will give user object
+						("user with given id is not found")); 
+		
+		Cart cart = user.getCart();     // to fetch the cart 
+		
+		if (cart==null)
+		{	
+			cart = new Cart();      // cart object
+			cart.setCartItems(new ArrayList<CartItem>());     // initialize the cart with array list
+			cart.setUser(user);     // set for user
+			
+			cart = cartRepository.save(cart);
+			
+		}
+		
+		return cart;          // updated cart return
+	}
+
+}

@@ -1,0 +1,20 @@
+package com.study.backend.services.impl;
+
+import com.study.backend.entities.Cart;
+import com.study.backend.services.CartService;
+
+public class CartServiceImpl implements CartService{
+
+	@Override
+	public void addTocart(String userId, Integer productId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public Cart getCart(String userId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

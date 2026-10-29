@@ -1,0 +1,102 @@
+package com.study.backend.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.study.backend.dtos.ApiResponse;
+import com.study.backend.dtos.ProductDto;
+import com.study.backend.services.ProductService;
+
+import jakarta.validation.Valid;
+
+@RestController    // it is combination of controller and response body
+@RequestMapping("/products")
+@CrossOrigin
+public class ProductController {
+	
+	// fetch product service bean
+	@Autowired 
+	private ProductService productService;
+	
+//      ==========================================================
+//            POST - localhost:8080/users
+//      ============================================================
+	
+	@PostMapping
+	public ResponseEntity<ProductDto> addProduct (@Valid @RequestBody ProductDto productDto)
+	{
+	// Return type method_name
+		ProductDto savedProduct = productService.addProduct(productDto);
+	
+	// responseEntity 
+	return new ResponseEntity<ProductDto>(savedProduct, HttpStatus.CREATED);     // status code :201
+	}
+	
+// get all product	
+//      ================================================================
+//          GET : localhost:8080/products                   all product show    status code:200 ok
+//      ================================================================
+	
+	@GetMapping
+	public ResponseEntity<List<ProductDto>> getAllProducts(@RequestParam (defaultValue ="0") int page,               // request parameter 
+			                                               @RequestParam (defaultValue ="25")int size)                 
+	     {
+	    	 List<ProductDto> products = productService.getAllProducts(page,size);
+	    	 
+	    	 return ResponseEntity.ok(products);
+	     }
+
+//    find by id 		
+//      ===============================================================
+//            GET : localhost:8080/products/{id}
+//      ===============================================================
+	
+	@GetMapping("/{id}")
+	public ResponseEntity <ProductDto> getProductById(@PathVariable Integer id)
+	{
+        ProductDto productDto = productService.getProducById(id);
+		
+        return ResponseEntity.ok(productDto);
+	}
+		
+
+//              update
+//        ===============================================================
+//            PUT : localhost:8080/products/{id}
+//        ===============================================================
+
+	@PutMapping("/{id}")
+	public ResponseEntity <ProductDto> updateProduct(@Valid @PathVariable Integer id, @RequestBody ProductDto productDto)
+	{
+        ProductDto updatedProduct = productService.updateProduct(id, productDto);
+		
+        return ResponseEntity.ok(updatedProduct);
+	}
+
+	
+//      Delete	
+//       ===============================================================
+//          DELETE : localhost:8080/products/{id}
+//       ===============================================================
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<ApiResponse> deleteProduct (@PathVariable Integer id)
+	{
+		productService.deleteProduct(id);
+		
+		return ResponseEntity.ok(new ApiResponse("product deleted successfully"));
+	}
+}

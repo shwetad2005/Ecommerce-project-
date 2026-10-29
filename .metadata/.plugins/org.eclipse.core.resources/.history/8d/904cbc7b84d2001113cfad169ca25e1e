@@ -1,0 +1,13 @@
+package com.study.backend.services;
+
+import com.study.backend.entities.Cart;
+
+public interface CartService {
+	
+	// abstract is a public 
+	
+	void addTocart(String userId, Integer productId);
+	
+	Cart getCart(String userId);
+
+}
